@@ -15,6 +15,10 @@ function App() {
         socket.emit("send_message", { message });
     };
 
+    const startGame = () => {
+        socket.emit("start_game");
+    };
+
     useEffect(() => {
         socket.on("recieve_message", (data) => {
             setMessageReceived(data.message);
@@ -27,45 +31,71 @@ function App() {
                 onChange={(event) => {
                     setMessage(event.target.value);
                 }}
+                onKeyUp={(event) => {
+                    if (event.key === "Enter") {
+                        sendMessage();
+                    }
+                }}
             />
             <Button onClick={sendMessage}>Send Message</Button>
+            <Button onClick={startGame}>Start Game</Button>
             <h1>Message:</h1>
-            {messageReceived}      
+            {messageReceived}
             <Container>
-                <Row className="justify-content-md-center">
-                    <Col>
-                        F1C1
-                    </Col>
-                    <Col xs={8}>
-                        <PlayerCards socket={socket}></PlayerCards>
-                    </Col>
-                    <Col>
-                        F1C3
-                    </Col>
-                </Row>
-                <Row className="justify-content-md-center">
-                    <Col md={1}>
-                        F2C1
-                        <PlayerCards socket={socket}></PlayerCards>
-                    </Col>
-                    <Col xs={12} md={6} className="justify-content-md-center">
-                        F2C2
-                        <PlayerCards socket={socket}></PlayerCards>
-                    </Col>
-                    <Col md={1}>
-                        F2C3
-                        <PlayerCards socket={socket}></PlayerCards>
+                <Row className="justify-content-md-center mt-1 mb-4">
+                    <Col sm={4}>
+                        <Container className="mx-auto d-flex" style={{ width: "40%" }}>
+                            <Row>
+                                <Col>
+                                    F1C1
+                                    <PlayerCards socket={socket}></PlayerCards>
+                                </Col>
+                            </Row>
+                        </Container>
                     </Col>
                 </Row>
-                <Row className="justify-content-md-center">
-                    <Col>
-                        F3C1
+                <Row className="mx-auto d-flex mb-4">
+                    <Col md={4}>
+                        <Container className="mx-auto d-flex" style={{ width: "40%" }}>
+                            <Row>
+                                <Col>
+                                    F2C1
+                                    <PlayerCards socket={socket}></PlayerCards>
+                                </Col>
+                            </Row>
+                        </Container>
                     </Col>
-                    <Col xs={8}>
-                        <PlayerCards socket={socket}></PlayerCards>
+                    <Col md={4}>
+                        <Container className="mx-auto d-flex" style={{ width: "40%" }}>
+                            <Row>
+                                <Col>
+                                    F2C2
+                                    <PlayerCards socket={socket}></PlayerCards>
+                                </Col>
+                            </Row>
+                        </Container>
                     </Col>
-                    <Col>
-                        F3C3
+                    <Col md={4}>
+                        <Container className="mx-auto d-flex" style={{ width: "40%" }}>
+                            <Row>
+                                <Col>
+                                    F2C3
+                                    <PlayerCards socket={socket}></PlayerCards>
+                                </Col>
+                            </Row>
+                        </Container>
+                    </Col>
+                </Row>
+                <Row className="justify-content-md-center mb-4">
+                <Col md={4}>
+                        <Container className="mx-auto d-flex" style={{ width: "40%" }}>
+                            <Row>
+                                <Col>
+                                    F3C1
+                                    <PlayerCards socket={socket}></PlayerCards>
+                                </Col>
+                            </Row>
+                        </Container>
                     </Col>
                 </Row>
             </Container>
