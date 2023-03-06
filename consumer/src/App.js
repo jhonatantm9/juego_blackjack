@@ -45,7 +45,7 @@ function App() {
                 </Row>
             </Container>
             <Card key={'hi'}>Hi</Card>
-            <Image src={require('./static/media/2-C.png')}></Image>
+            <Image src="images/2-C.png"></Image>
         </div>
     );
 }
