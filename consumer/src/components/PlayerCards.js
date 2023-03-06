@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, CardGroup, Image } from 'react-bootstrap';
+import { Card, CardGroup } from 'react-bootstrap';
 
 export default function PlayerCards(props){
     const [cards, setCards] = useState([]);
@@ -10,6 +10,16 @@ export default function PlayerCards(props){
             console.log("Llegó un mensaje");
             setCards( ( ) => { cards.push(data.message); return cards; } );
             console.log(cards);
+        });
+
+        props.socket.on("receive_card", (data) => {
+            setCards( ( ) => { cards.push(data.card); return cards; } );
+        });
+
+        props.socket.on("add_card", (data) => {
+            if(playerId === data.playerId){
+                setCards( ( ) => { cards.push("BACK"); return cards; } );
+            }
         });
     }, [props.socket])
 
