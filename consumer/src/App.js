@@ -32,20 +32,43 @@ function App() {
             <h1>Message:</h1>
             {messageReceived}      
             <Container>
-                <Row>
+                <Row className="justify-content-md-center">
                     <Col>
-                        C1
+                        F1C1
                     </Col>
                     <Col xs={8}>
                         <PlayerCards socket={socket}></PlayerCards>
                     </Col>
                     <Col>
-                        C3
+                        F1C3
+                    </Col>
+                </Row>
+                <Row className="justify-content-md-center">
+                    <Col md={1}>
+                        F2C1
+                        <PlayerCards socket={socket}></PlayerCards>
+                    </Col>
+                    <Col xs={12} md={6} className="justify-content-md-center">
+                        F2C2
+                        <PlayerCards socket={socket}></PlayerCards>
+                    </Col>
+                    <Col md={1}>
+                        F2C3
+                        <PlayerCards socket={socket}></PlayerCards>
+                    </Col>
+                </Row>
+                <Row className="justify-content-md-center">
+                    <Col>
+                        F3C1
+                    </Col>
+                    <Col xs={8}>
+                        <PlayerCards socket={socket}></PlayerCards>
+                    </Col>
+                    <Col>
+                        F3C3
                     </Col>
                 </Row>
             </Container>
-            <Card key={'hi'}>Hi</Card>
-            <Image src="images/2-C.png"></Image>
         </div>
     );
 }

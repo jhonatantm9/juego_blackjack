@@ -3,6 +3,7 @@ import { Card, CardGroup, Image } from 'react-bootstrap';
 
 export default function PlayerCards(props){
     const [cards, setCards] = useState([]);
+    let playerId = props.socket.id;
 
     useEffect(() => {
         props.socket.on("recieve_message", (data) => {
@@ -21,7 +22,6 @@ export default function PlayerCards(props){
                         return(
                             <Card key={card}>
                                 <Card.Img variant="top" src={imageString} style={{width:'100px'}}/>
-                                <Card.Body>{card}</Card.Body>
                             </Card>
                         );
                     })
