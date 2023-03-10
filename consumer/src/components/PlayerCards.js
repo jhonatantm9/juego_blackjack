@@ -3,6 +3,7 @@ import { Card, CardGroup } from 'react-bootstrap';
 
 export default function PlayerCards(props){
     const [cards, setCards] = useState([]);
+    const [cardsValues, setCardsValues] = useState([]);
     let playerId = props.socket.id;
 
     useEffect(() => {
@@ -21,17 +22,20 @@ export default function PlayerCards(props){
         // });
 
         props.socket.on("add_card", (data) => {
-            if(playerId === data.playerId && !data.private){
-                addCard(data.card);
-            }else if(playerId === data.playerId && data.private){
-                addCard("BACK");
+            if(playerId === data.playerId){
+                setCardsValues( ( ) => { cardsValues.push(data.card); return cardsValues; } );
+                if(data.private){
+                    setCards( ( ) => { cards.push("BACK"); return cards; } );
+                }else{
+                    setCards( ( ) => { cards.push(data.card); return cards; } );
+                }
             }
         });
     }, [props.socket])
 
-    const addCard  = (card) => {
-        setCards( ( ) => { cards.push(card); return cards; } );
-    }
+    // const addCard  = (card) => {
+    //     setCards( ( ) => { cards.push(card); return cards; } );
+    // }
 
     return(
         <div id='deck'>

@@ -9,7 +9,7 @@ const socket = io.connect("http://localhost:3001");//URL backend
 function App() {
     const [message, setMessage] = useState("");
     const [messageReceived, setMessageReceived] = useState("");
-
+    var playersId = ["", "", "", ""];
 
     const sendMessage = () => {
         socket.emit("send_message", { message });
@@ -22,6 +22,22 @@ function App() {
     useEffect(() => {
         socket.on("receive_message", (data) => {
             setMessageReceived(data.message);
+        });
+
+        socket.on("receive_ids", (data) => {
+            i = 0;
+            while(i < data.playersId.length){
+                playersId[i] = data.playersId[i];
+                i++;
+            }
+            for(let j = 0; j < 4; j++){
+                let aux = playersId[j];
+                if(aux === socket.id){
+                    playersId[j] = playersId[0];
+                    playersId[0] = aux;
+                }
+            }
+            console.log(playersId);
         });
     }, [socket])
     return (
@@ -48,7 +64,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    <PlayerCards socket={socket}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[3]}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -60,7 +76,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C1
-                                    <PlayerCards socket={socket}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[2]}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -80,7 +96,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C3
-                                    <PlayerCards socket={socket}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[1]}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -92,7 +108,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F3C1
-                                    <PlayerCards socket={socket}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[0]}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>

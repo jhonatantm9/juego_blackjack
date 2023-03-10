@@ -27,10 +27,11 @@ io.on("connection", (socket) => {
         startGame();
         for(let i = 0; i < playersId.length; i++){
             for (let j = 0; i < 2; i++) {
-                card = addCard(playersId[i]);
-                io.to(playersId[i]).emit("initial_card", {card: card});
+                // card = addCard(playersId[i]);
+                // io.to(playersId[i]).emit("initial_card", {card: card});
             }
         }
+        io.emit("receive_ids", {playersId: playersId});
     });
 
     socket.on("request_card", (data) => {
