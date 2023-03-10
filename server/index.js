@@ -17,13 +17,20 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
     playersId.push(socket.id);
+    console.log(playersId)
 
     socket.on("send_message", (data) => {
         socket.broadcast.emit("receive_message", data);
     });
 
-    socket.on("startGame", () =>{
+    socket.on("start_game", (data) =>{
         startGame();
+        for(let i = 0; i < playersId.length; i++){
+            for (let j = 0; i < 2; i++) {
+                card = addCard(playersId[i]);
+                io.to(playersId[i]).emit("initial_card", {card: card});
+            }
+        }
     });
 
     socket.on("request_card", (data) => {
@@ -79,6 +86,7 @@ function shuffleDeck() {
 function startGame() {
     buildDeck();
     shuffleDeck();
+    console.log('Deck of cards is ready');
 
     playersSum = Array(numberOfPlayers).fill(0);
     playersAceCount = Array(numberOfPlayers).fill(0);
@@ -87,21 +95,21 @@ function startGame() {
     dealerAceCount += checkAce(hidden);
 
     // console.log(hidden);
-    // console.log(dealerSum);
-    while (dealerSum < 17) {
-        //<img src="./cards/4-C.png">
-        addCard("dealer-cards");
-    }
     console.log(dealerSum);
+    // while (dealerSum < 17) {
+    //     //<img src="./cards/4-C.png">
+    //     addCard("dealer-cards");
+    // }
+    // console.log(dealerSum);
     for(let i = 0; i < numberOfPlayers; i++){
         for (let j = 0; i < 2; i++) {
             addCard(playersId[i]);
         }
     }
 
-    console.log(yourSum);
-    document.getElementById("hit").addEventListener("click", hit);
-    document.getElementById("stay").addEventListener("click", stay);
+    //console.log(yourSum);
+    //document.getElementById("hit").addEventListener("click", hit);
+    //document.getElementById("stay").addEventListener("click", stay);
 
 }
 
@@ -113,6 +121,9 @@ function addCard(userId){
             playersAceCount[i] += checkAce(card);
         }
     }
+    io.on("connection", (socket) => {
+        socket.on
+    });
     return(card);
 }
 

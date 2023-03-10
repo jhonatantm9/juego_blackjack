@@ -16,11 +16,11 @@ function App() {
     };
 
     const startGame = () => {
-        socket.emit("start_game");
+        socket.emit("start_game", {hostPlayer: socket.id});
     };
 
     useEffect(() => {
-        socket.on("recieve_message", (data) => {
+        socket.on("receive_message", (data) => {
             setMessageReceived(data.message);
         });
     }, [socket])
