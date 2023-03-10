@@ -8,28 +8,26 @@ const Home = () => {
     };
     return (
         <div className="prueba">
-            <h1>Home</h1>
-            <button
-                onClick={() => {
-                    navigate("/about");
-                }}
-            >
-                Go to about
-            </button>
-            <button
-                onClick={() => {
-                    navigate("/dashboard");
-                }}
-            >
-                Go to dashboard
-            </button>
-            <button
-                onClick={startGame}
-            >
-                Start Game
-            </button>
+
+            <div className="container">
+                <div className="text1">
+                    <h3>Nombre</h3>
+                    <input type="text" placeholder="Ingrese su nombre" />
+                </div>
+
+                <div className="text2">
+                    <h3>Sala</h3>
+                    <input type="text" placeholder="Ingrese el id de la sala" />
+
+                </div>
+                <button onClick={startGame}>
+                    Ingresar
+                </button>
+            </div>
+
         </div>
     );
+
 }
 
 export default Home;

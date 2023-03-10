@@ -1,10 +1,31 @@
-.prueba{
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.prueba {
     background-color: #000;
-    color: #fff;
+    color: black;
     font-size: 20px;
     font-weight: bold;
     padding: 10px;
     text-align: center;
-    text-transform: uppercase;
+    text-transform: none;
     min-height: 100vh;
+    background-image: url(../public/images/bj.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: right;
+}
+
+.container {
+    width: 100%;
+    margin-left: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
 }
