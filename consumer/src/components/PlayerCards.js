@@ -4,7 +4,7 @@ import { Card, CardGroup } from 'react-bootstrap';
 export default function PlayerCards(props){
     const [cards, setCards] = useState([]);
     const [cardsValues, setCardsValues] = useState([]);
-    let playerId = props.socket.id;
+    let playerId = "";
 
     useEffect(() => {
         props.socket.on("receive_message", (data) => {
@@ -21,10 +21,11 @@ export default function PlayerCards(props){
         //     addCard(data.card);
         // });
 
-        props.socket.on("add_card", (data) => {
-            if(playerId === data.playerId){
+        props.socket.on("receive_card", (data) => {
+            if(playerId === data.id){
+                console.log("Card for "+ playerId + "  " + data.card)
                 setCardsValues( ( ) => { cardsValues.push(data.card); return cardsValues; } );
-                if(data.private){
+                if(props.private){
                     setCards( ( ) => { cards.push("BACK"); return cards; } );
                 }else{
                     setCards( ( ) => { cards.push(data.card); return cards; } );
@@ -32,6 +33,10 @@ export default function PlayerCards(props){
             }
         });
     }, [props.socket])
+
+    useEffect(() => {
+        playerId = props.id;
+    }, [props.id]);
 
     // const addCard  = (card) => {
     //     setCards( ( ) => { cards.push(card); return cards; } );

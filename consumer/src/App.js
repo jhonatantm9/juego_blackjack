@@ -25,7 +25,7 @@ function App() {
         });
 
         socket.on("receive_ids", (data) => {
-            i = 0;
+            let i = 0;
             while(i < data.playersId.length){
                 playersId[i] = data.playersId[i];
                 i++;
@@ -64,7 +64,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    <PlayerCards socket={socket} id={playersId[3]}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[3]} private={true}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -76,7 +76,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C1
-                                    <PlayerCards socket={socket} id={playersId[2]}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[2]} private={true}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -96,7 +96,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C3
-                                    <PlayerCards socket={socket} id={playersId[1]}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[1]} private={true}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -108,7 +108,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F3C1
-                                    <PlayerCards socket={socket} id={playersId[0]}></PlayerCards>
+                                    <PlayerCards socket={socket} id={playersId[0]} private={false}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>

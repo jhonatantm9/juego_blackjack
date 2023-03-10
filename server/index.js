@@ -23,6 +23,13 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("receive_message", data);
     });
 
+    socket.on('disconnect', function() {
+        console.log('Got disconnect!');
+  
+        var i = playersId.indexOf(socket.id);
+        playersId.splice(i, 1);
+     });
+
     socket.on("start_game", (data) =>{
         startGame();
         for(let i = 0; i < playersId.length; i++){
@@ -36,8 +43,9 @@ io.on("connection", (socket) => {
 
     socket.on("request_card", (data) => {
         card = addCard(data.id);
-        io.to(socket.id).emit("receive_card", {card: card});
-        socket.broadcast.emit("add_card", {playerId: socket.id});
+        io.emit("receive_card", {card: card, id: data.id});
+        // io.to(socket.id).emit("receive_card", {card: card});
+        // socket.broadcast.emit("add_card", {playerId: socket.id});
     });
 });
 
@@ -104,7 +112,8 @@ function startGame() {
     // console.log(dealerSum);
     for(let i = 0; i < numberOfPlayers; i++){
         for (let j = 0; i < 2; i++) {
-            addCard(playersId[i]);
+            card = addCard(playersId[i]);
+            io.emit("receive_card", {card: card, id: playersId[i]});
         }
     }
 
@@ -122,9 +131,6 @@ function addCard(userId){
             playersAceCount[i] += checkAce(card);
         }
     }
-    io.on("connection", (socket) => {
-        socket.on
-    });
     return(card);
 }
 
