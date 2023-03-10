@@ -16,7 +16,7 @@ function App() {
     };
 
     const startGame = () => {
-        socket.emit("start_game", {hostPlayer: socket.id});
+        socket.emit("start_game", { hostPlayer: socket.id });
     };
 
     useEffect(() => {
@@ -25,14 +25,14 @@ function App() {
         });
 
         socket.on("receive_ids", (data) => {
-            i = 0;
-            while(i < data.playersId.length){
+            let i = 0;
+            while (i < data.playersId.length) {
                 playersId[i] = data.playersId[i];
                 i++;
             }
-            for(let j = 0; j < 4; j++){
+            for (let j = 0; j < 4; j++) {
                 let aux = playersId[j];
-                if(aux === socket.id){
+                if (aux === socket.id) {
                     playersId[j] = playersId[0];
                     playersId[0] = aux;
                 }
@@ -103,7 +103,7 @@ function App() {
                     </Col>
                 </Row>
                 <Row className="justify-content-md-center mb-4">
-                <Col md={4}>
+                    <Col md={4}>
                         <Container className="mx-auto d-flex" style={{ width: "40%" }}>
                             <Row>
                                 <Col>
