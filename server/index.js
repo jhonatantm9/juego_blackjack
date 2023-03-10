@@ -31,6 +31,7 @@ io.on("connection", (socket) => {
      });
 
     socket.on("start_game", (data) =>{
+        io.emit("receive_ids", {playersId: playersId});
         startGame();
         for(let i = 0; i < playersId.length; i++){
             for (let j = 0; i < 2; i++) {
@@ -38,7 +39,7 @@ io.on("connection", (socket) => {
                 // io.to(playersId[i]).emit("initial_card", {card: card});
             }
         }
-        io.emit("receive_ids", {playersId: playersId});
+        
     });
 
     socket.on("request_card", (data) => {

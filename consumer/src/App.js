@@ -9,7 +9,7 @@ const socket = io.connect("http://localhost:3001");//URL backend
 function App() {
     const [message, setMessage] = useState("");
     const [messageReceived, setMessageReceived] = useState("");
-    var playersId = ["", "", "", ""];
+    const [playersId, setPlayersId] = useState(["", "", "", ""]);
 
     const sendMessage = () => {
         socket.emit("send_message", { message });
@@ -19,27 +19,62 @@ function App() {
         socket.emit("start_game", { hostPlayer: socket.id });
     };
 
+    socket.on("receive_message", (data) => {
+        setMessageReceived(data.message);
+    });
+
     useEffect(() => {
-        socket.on("receive_message", (data) => {
-            setMessageReceived(data.message);
-        });
+        console.log("UseEffect App.js");
+        // socket.on("receive_message", (data) => {
+        //     setMessageReceived(data.message);
+        // });
 
         socket.on("receive_ids", (data) => {
-            let i = 0;
-            while (i < data.playersId.length) {
-                playersId[i] = data.playersId[i];
-                i++;
-            }
-            for (let j = 0; j < 4; j++) {
-                let aux = playersId[j];
-                if (aux === socket.id) {
-                    playersId[j] = playersId[0];
-                    playersId[0] = aux;
+            // while (i < data.playersId.length) {
+            //     setPlayersId( () => {
+            //         playersId[i] = data.playersId[i];
+            //         return playersId;
+            //     });
+            //     // playersId[i] = data.playersId[i];
+            //     i++;
+            // }
+            setPlayersId(() => {
+                //playersId = new Array(4).fill("");
+                let i = 0;
+                while(i < data.playersId.length){
+                    
+                    playersId[i] = data.playersId[i];
+                    i++;
                 }
-            }
-            console.log(playersId);
+                for (let j = 0; j < 4; j++) {
+                    let aux = playersId[j];
+                    if (aux === socket.id) {
+                        playersId[j] = playersId[0];
+                        playersId[0] = aux;
+                    }
+                }
+                console.log(playersId);
+                return playersId;
+            });
+            // setPlayersId(() => {
+            //     for (let j = 0; j < 4; j++) {
+            //         let aux = playersId[j];
+            //         if (aux === socket.id) {
+            //             playersId[j] = playersId[0];
+            //             playersId[0] = aux;
+            //         }
+            //     }
+            //     return playersId;
+            // });
+            // for (let j = 0; j < 4; j++) {
+            //     let aux = playersId[j];
+            //     if (aux === socket.id) {
+            //         playersId[j] = playersId[0];
+            //         playersId[0] = aux;
+            //     }
+            // }
         });
-    }, [socket])
+    }, [socket, playersId[0]])
     return (
         <div className="App">
             <input
@@ -64,7 +99,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    <PlayerCards socket={socket} id={playersId[3]}></PlayerCards>
+                                    {/* <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} /> */}
                                 </Col>
                             </Row>
                         </Container>
@@ -76,7 +111,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C1
-                                    <PlayerCards socket={socket} id={playersId[2]}></PlayerCards>
+                                    {/* <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={true}></PlayerCards> */}
                                 </Col>
                             </Row>
                         </Container>
@@ -86,7 +121,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C2
-                                    <PlayerCards socket={socket}></PlayerCards>
+                                    {/* <PlayerCards socket={socket}></PlayerCards> */}
                                 </Col>
                             </Row>
                         </Container>
@@ -96,7 +131,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C3
-                                    <PlayerCards socket={socket} id={playersId[1]}></PlayerCards>
+                                    {/* <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={true}></PlayerCards> */}
                                 </Col>
                             </Row>
                         </Container>
@@ -108,7 +143,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F3C1
-                                    <PlayerCards socket={socket} id={playersId[0]}></PlayerCards>
+                                    <PlayerCards socket={socket} idPlayer={playersId[0]} showCards={false}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
