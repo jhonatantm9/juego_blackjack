@@ -6,11 +6,11 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
     const [cardsValues, setCardsValues] = useState([]);
     const [idP, setIdP] = useState(idPlayer);
     //let playerId = "";
-    console.log(idP);
+    //console.log(idP);
 
     useEffect(() => {
         
-        console.log("Se ejecuto use Effect " + idP);
+        console.log("Se ejecuto use Effect: " + idP);
         socket.on("receive_message", (data) => {
             console.log("Llegó un mensaje");
             setCards( ( ) => { cards.push(data.message); return cards; } );
@@ -21,7 +21,7 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
             console.log("Receive card " + idPlayer);
             
             if(idPlayer === data.id){
-                console.log("Card for "+ idPlayer + "  " + data.card);
+                // console.log("Card for "+ idPlayer + "  " + data.card);
                 setCardsValues( ( ) => { cardsValues.push(data.card); return cardsValues; } );
                 if(showCards){
                     console.log()
@@ -34,8 +34,9 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
     }, [socket, idP]);
 
     useEffect(() => {
-        console.log("Use effect dep idPlayer " + idP);
+        
         setIdP(idPlayer);
+        //console.log("cambio de id por: " + idP);
     }, [idPlayer]);
 
     return(
