@@ -9,18 +9,13 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
     console.log(idP);
 
     useEffect(() => {
-        setIdP(idPlayer);
+        
         console.log("Se ejecuto use Effect " + idP);
         socket.on("receive_message", (data) => {
             console.log("Llegó un mensaje");
             setCards( ( ) => { cards.push(data.message); return cards; } );
             console.log(cards);
         });
-
-        // socket.on("receive_ids", (data) => {
-        //     //console.log()
-        //     setIdP(idPlayer);
-        // });
 
         socket.on("receive_card", (data) => {
             console.log("Receive card " + idPlayer);
@@ -38,9 +33,10 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
         });
     }, [socket, idP]);
 
-    // useEffect(() => {
-    //     playerId = id;
-    // }, [id]);
+    useEffect(() => {
+        console.log("Use effect dep idPlayer " + idP);
+        setIdP(idPlayer);
+    }, [idPlayer]);
 
     return(
         <div id='deck'>

@@ -30,19 +30,11 @@ function App() {
         // });
 
         socket.on("receive_ids", (data) => {
-            // while (i < data.playersId.length) {
-            //     setPlayersId( () => {
-            //         playersId[i] = data.playersId[i];
-            //         return playersId;
-            //     });
-            //     // playersId[i] = data.playersId[i];
-            //     i++;
-            // }
+            console.log("data: " + data.playersId);
             setPlayersId(() => {
                 //playersId = new Array(4).fill("");
                 let i = 0;
                 while(i < data.playersId.length){
-                    
                     playersId[i] = data.playersId[i];
                     i++;
                 }
@@ -53,28 +45,14 @@ function App() {
                         playersId[0] = aux;
                     }
                 }
-                console.log(playersId);
+                // console.log(playersId);
                 return playersId;
             });
-            // setPlayersId(() => {
-            //     for (let j = 0; j < 4; j++) {
-            //         let aux = playersId[j];
-            //         if (aux === socket.id) {
-            //             playersId[j] = playersId[0];
-            //             playersId[0] = aux;
-            //         }
-            //     }
-            //     return playersId;
-            // });
-            // for (let j = 0; j < 4; j++) {
-            //     let aux = playersId[j];
-            //     if (aux === socket.id) {
-            //         playersId[j] = playersId[0];
-            //         playersId[0] = aux;
-            //     }
-            // }
+            console.log(playersId);
         });
-    }, [socket, playersId[0]])
+    }, [socket])
+
+
     return (
         <div className="App">
             <input
