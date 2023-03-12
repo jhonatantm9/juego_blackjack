@@ -1,36 +1,48 @@
 import { useState, useEffect } from "react";
 import { Card, CardGroup } from 'react-bootstrap';
 
-export default function DealerCards(props){
+export default function PlayerCards( { socket } ){
     const [cards, setCards] = useState([]);
-    let playerId = props.socket.id;
+    const [cardsValues, setCardsValues] = useState([]);
+
+    socket.on("receive_dealer_cards", (data) => {
+        data.cards.forEach(card => {
+            setCardsValues((prevCardsValues) => [...prevCardsValues, card]);
+            setCards((prevCards) => [...prevCards, "BACK"]);
+        });
+    });
+
+    socket.on("receive_initial_dealer_cards", (data) => {
+        data.cards.forEach((card, index) => {
+            if(cards.length < 2){
+                setCardsValues((prevCardsValues) => [...prevCardsValues, card]);
+                if(index == 0){
+                    setCards((prevCards) => [...prevCards, card]);
+                }else{
+                    setCards((prevCards) => [...prevCards, "BACK"]);
+                }
+            }
+        });        
+    });
 
     useEffect(() => {
-        props.socket.on("receive_message", (data) => {
+        socket.on("receive_message", (data) => {
             console.log("Llegó un mensaje");
             setCards( ( ) => { cards.push(data.message); return cards; } );
             console.log(cards);
         });
-
-        props.socket.on("receive_card", (data) => {
-            setCards( ( ) => { cards.push(data.card); return cards; } );
-        });
-
-        props.socket.on("add_card", (data) => {
-            if(playerId === data.playerId){
-                setCards( ( ) => { cards.push("BACK"); return cards; } );
-            }
-        });
-    }, [props.socket])
+    }, [socket]);
+    
 
     return(
         <div id='deck'>
             <CardGroup>
                 {
-                    cards.map(card => {
+                    cards.map( (card, index) => {
                         let imageString = "images/" + card + ".png";
+                        let keyValue = card + "-" + index;
                         return(
-                            <Card key={card}>
+                            <Card key={keyValue}>
                                 <Card.Img variant="top" src={imageString} style={{width:'100px'}}/>
                             </Card>
                         );

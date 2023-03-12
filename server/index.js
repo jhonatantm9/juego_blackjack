@@ -34,18 +34,28 @@ io.on("connection", (socket) => {
     socket.on("start_game", (data) =>{
         io.emit("receive_ids", {playersId: playersId});
         //wait(1000);
-        setTimeout(startGame(), 1000);        
+        //setTimeout(startGame(), 1000);        
+        startGame();
     });
 
     socket.on("request_card", (data) => {
-        card = addCard(data.id);
-        io.emit("receive_card", {card: card, id: data.id});
+        let card = addCard(data.id);
+        let canHit = true;
+        if (reduceAce(data.id) > 21) {
+            canHit = false;
+        }
+        io.emit("receive_card", {card: card, id: data.id, canHit: canHit});
         // io.to(socket.id).emit("receive_card", {card: card});
         // socket.broadcast.emit("add_card", {playerId: socket.id});
     });
 
     socket.on("stay", (data) => {
-        //TODO
+        let nextPlayer = changeTurn(data.id);
+        if(nextPlayer === "dealer"){
+            let dealerCards = hitDealerCards();
+            io.emit("receive_dealer_cards", {cards: dealerCards});
+            //let playersResults = doPlayersWin();
+        }
     });
 });
 
@@ -68,7 +78,7 @@ var playersAceCount;
 var hidden;
 var deck;
 
-var canHit = true; //allows the player (you) to draw while yourSum <= 21
+//var canHit = true; //allows the player (you) to draw while yourSum <= 21
 
 function buildDeck() {
     let values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
@@ -125,18 +135,31 @@ function startGame() {
         }
     }
     io.emit("receive_initial_cards", {cards: cardsToSend});
+
+    var dealerCards = [];
+    for (let i = 0; i < 2; i++) {
+        dealerCards.push(addCard("dealer"));        
+    }
+
+    io.emit("receive_initial_dealer_cards", {cards: dealerCards});
+
     console.log("end of startGame");
 
 }
 
 function addCard(userId){
     let card = deck.pop();
-    for(let i = 0; i < playersId.length; i++){
-        if(playersId[i] === userId){
-            playersSum[i] += getValue(card);
-            playersAceCount[i] += checkAce(card);
-            console.log("card added to player " + playersId[i] + ", card value: " + card);
+    if(userId != "dealer"){
+        for(let i = 0; i < playersId.length; i++){
+            if(playersId[i] === userId){
+                playersSum[i] += getValue(card);
+                playersAceCount[i] += checkAce(card);
+                console.log("card added to player " + playersId[i] + ", card value: " + card);
+            }
         }
+    }else{
+        dealerSum += getValue(card);
+        dealerAceCount += checkAce(card);
     }
     return(card);
 }
@@ -199,6 +222,45 @@ function stay() {
     document.getElementById("results").innerText = message;
 }
 
+function hitDealerCards(){
+    let maxValue = Math.floor(Math.random() * 3) + 15;
+    var dealerCards = []
+    while (dealerSum < maxValue) {
+        dealerCards.push(addCard("dealer"));
+        reduceAce("dealer");
+        console.log("dealer sum: " + dealerSum);
+    }
+    return dealerCards;
+}
+
+function doPlayersWin(){
+    playersId.forEach(element => {
+        reduceAce(element);
+    });
+    reduceAce("dealer");
+    
+    var playersResults = Array(numberOfPlayers).fill(1);
+    if(dealerSum > 21){
+        return playersResults;
+    }
+    for (let i = 0; i < playersResults.length; i++) {
+        if (playersSum[i] > 21) {
+            playersResults[i] = -1;
+        }
+        //both you and dealer <= 21
+        else if (playersSum[i] == dealerSum) {
+            playersResults[i] = 0;
+        }
+        else if (playersSum[i] > dealerSum) {
+            playersResults[i] = 1;
+        }
+        else{
+            playersResults[i] = -1;
+        }
+    }
+    return playersResults;
+}
+
 function getValue(card) {
     let data = card.split("-"); // "4-C" -> ["4", "C"]
     let value = data[0];
@@ -219,10 +281,19 @@ function checkAce(card) {
     return 0;
 }
 
-function reduceAce(playerSum, playerAceCount) {
-    while (playerSum > 21 && playerAceCount > 0) {
-        playerSum -= 10;
-        playerAceCount -= 1;
+function reduceAce(playerId) {
+    if(playerId != "dealer"){
+        let i = playersId.indexOf(playerId);
+        let playerSum = playersSum[i];
+        let playerAceCount = playersAceCount[i];
+        while (playerSum > 21 && playerAceCount > 0) {
+            playersSum[i] -= 10;
+            playersAceCount[i] -= 1;
+        }
+        return playerSum[i];
+    }else{
+        dealerSum -= 10;
+        dealerAceCount -= 1;
+        return dealerSum
     }
-    return playerSum;
 }
