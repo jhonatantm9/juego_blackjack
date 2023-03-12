@@ -49,7 +49,7 @@ function App() {
         }
         console.log("new array: " + newArray);
         //setPlayersId(newArray);
-        return(newArray);
+        return (newArray);
         // setPlayersId(() => {
         //     //playersId = new Array(4).fill("");
         //     let i = 0;
@@ -68,7 +68,7 @@ function App() {
         //     // console.log(playersId);
         //     return newArray;
         // });
-        
+
     }
 
     const changeIdPlayers = (data) => {
@@ -93,18 +93,18 @@ function App() {
             let newPlayersId = [...prevState];
             let i = 0;
             while (i < data.playersId.length) {
-              newPlayersId[i] = data.playersId[i];
-              i++;
+                newPlayersId[i] = data.playersId[i];
+                i++;
             }
             for (let j = 0; j < 4; j++) {
-              let aux = newPlayersId[j];
-              if (aux === socket.id) {
-                newPlayersId[j] = newPlayersId[0];
-                newPlayersId[0] = aux;
-              }
+                let aux = newPlayersId[j];
+                if (aux === socket.id) {
+                    newPlayersId[j] = newPlayersId[0];
+                    newPlayersId[0] = aux;
+                }
             }
             return newPlayersId;
-          });
+        });
     }
 
 
@@ -170,7 +170,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    {/* <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} /> */}
+                                    {<PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} /> }
                                 </Col>
                             </Row>
                         </Container>
@@ -192,10 +192,24 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C2
-                                    {/* <PlayerCards socket={socket}></PlayerCards> */}
+                                    {<PlayerCards socket={socket}></PlayerCards>}
                                 </Col>
                             </Row>
                         </Container>
+                        <Row>
+                           <div className="" style={{paddingTop:"20px"}}>
+                           <div className="boton1 d-inline-block">
+                                <button onClick={startGame}>
+                                    Pedir
+                                </button>
+                            </div>
+                            <div className="boton2 d-inline-block">
+                                <button onClick={startGame}>
+                                    Plantarse
+                                </button>
+                            </div>
+                           </div>
+                        </Row>
                     </Col>
                     <Col md={4}>
                         <Container className="mx-auto d-flex" style={{ width: "40%" }}>
