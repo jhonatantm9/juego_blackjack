@@ -3,6 +3,7 @@ const app = express(); //Servidor express
 const http = require("http");
 const {Server} = require("socket.io");
 const cors = require("cors"); //Cors permite conexiones más fáciles y evitar posibles errores
+const { setTimeout } = require('timers/promises');
 
 app.use(cors());
 const server = http.createServer(app);
@@ -32,14 +33,8 @@ io.on("connection", (socket) => {
 
     socket.on("start_game", (data) =>{
         io.emit("receive_ids", {playersId: playersId});
-        startGame();
-        for(let i = 0; i < playersId.length; i++){
-            for (let j = 0; i < 2; i++) {
-                // card = addCard(playersId[i]);
-                // io.to(playersId[i]).emit("initial_card", {card: card});
-            }
-        }
-        
+        //wait(1000);
+        setTimeout(startGame(), 1000);        
     });
 
     socket.on("request_card", (data) => {
@@ -47,6 +42,10 @@ io.on("connection", (socket) => {
         io.emit("receive_card", {card: card, id: data.id});
         // io.to(socket.id).emit("receive_card", {card: card});
         // socket.broadcast.emit("add_card", {playerId: socket.id});
+    });
+
+    socket.on("stay", (data) => {
+        //TODO
     });
 });
 
@@ -58,6 +57,7 @@ server.listen(3001, () => {
 
 var numberOfPlayers = 4;
 var playersId = [];
+var playerPlaying = "";
 
 var dealerSum = 0;
 var playersSum;
@@ -90,7 +90,7 @@ function shuffleDeck() {
         deck[i] = deck[j];
         deck[j] = temp;
     }
-    console.log(deck);
+    //console.log(deck);
 }
 
 function startGame() {
@@ -98,8 +98,13 @@ function startGame() {
     shuffleDeck();
     console.log('Deck of cards is ready');
 
+    numberOfPlayers = playersId.length;
+    console.log(numberOfPlayers);
+    dealerSum = 0;
     playersSum = Array(numberOfPlayers).fill(0);
     playersAceCount = Array(numberOfPlayers).fill(0);
+    playerPlaying = "";
+
     hidden = deck.pop();
     dealerSum += getValue(hidden);
     dealerAceCount += checkAce(hidden);
@@ -111,16 +116,16 @@ function startGame() {
     //     addCard("dealer-cards");
     // }
     // console.log(dealerSum);
+    let cardsToSend = [];
     for(let i = 0; i < numberOfPlayers; i++){
-        for (let j = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
             card = addCard(playersId[i]);
-            io.emit("receive_card", {card: card, id: playersId[i]});
+            cardsToSend.push([playersId[i], card]);
+            //io.emit("receive_card", {card: card, id: playersId[i]});
         }
     }
-
-    //console.log(yourSum);
-    //document.getElementById("hit").addEventListener("click", hit);
-    //document.getElementById("stay").addEventListener("click", stay);
+    io.emit("receive_initial_cards", {cards: cardsToSend});
+    console.log("end of startGame");
 
 }
 
@@ -130,9 +135,25 @@ function addCard(userId){
         if(playersId[i] === userId){
             playersSum[i] += getValue(card);
             playersAceCount[i] += checkAce(card);
+            console.log("card added to player " + playersId[i] + ", card value: " + card);
         }
     }
     return(card);
+}
+
+function changeTurn(){
+    if(playerPlaying === ""){
+        playerPlaying = playersId[0];
+        return playersId[0];
+    }
+    let idPlayerPlaying = playersId.indexOf(playerPlaying);
+    if(idPlayerPlaying < 3){
+        playerPlaying = playersId[idPlayerPlaying + 1];
+        return playersId[idPlayerPlaying + 1];
+    }else{
+        playerPlaying = "dealer";
+        return "dealer";
+    }
 }
 
 function hit() {
