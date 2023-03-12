@@ -208,7 +208,7 @@ function App() {
                         </Container>
                     </Col>
                 </Row>
-                <Row className="justify-content-md-center mb-4">
+                <Row className="justify-content-md-center mt-1 mb-4">
                     <Col md={4}>
                         <Container className="mx-auto d-flex" style={{ width: "40%" }}>
                             <Row>

@@ -9,7 +9,7 @@ const Home = () => {
     return (
         <div className="prueba">
 
-            <div className="container">
+            <div className="containerHome">
                 <div className="text1">
                     <h3>Nombre</h3>
                     <input type="text" placeholder="Ingrese su nombre" />
