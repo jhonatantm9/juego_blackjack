@@ -2,6 +2,7 @@ import './App.css';
 import io from 'socket.io-client';
 import { useEffect, useState } from "react";
 import PlayerCards from './components/PlayerCards.js';
+import DealerCards from './components/DealerCards.js';
 import { Card, Button, Container, Row, Col, Image } from 'react-bootstrap';
 
 const socket = io.connect("http://localhost:3001");//URL backend
@@ -107,6 +108,11 @@ function App() {
           });
     }
 
+    const stay = () => {
+        //TODO desactivación de botones
+        socket.emit("stay", {id: playersId[0]});
+    }
+
 
     socket.on("receive_message", (data) => {
         setMessageReceived(data.message);
@@ -170,7 +176,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    {/* <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} /> */}
+                                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} />
                                 </Col>
                             </Row>
                         </Container>
@@ -182,7 +188,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C1
-                                    {/* <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={true}></PlayerCards> */}
+                                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={true}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -192,7 +198,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C2
-                                    {/* <PlayerCards socket={socket}></PlayerCards> */}
+                                    <DealerCards socket={socket}></DealerCards>
                                 </Col>
                             </Row>
                         </Container>

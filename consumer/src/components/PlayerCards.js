@@ -28,29 +28,30 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
     });
 
     socket.on("receive_initial_cards", (data) => {
-        console.log(data.cards);
-        console.log(idP);
+        //console.log(data.cards);
+        //console.log(idP);
         data.cards.forEach(element => {
-            if(idPlayer === element[0]){
+            if(idPlayer === element[0] && cards.length < 2){
                 console.log("Card for "+ idPlayer + "  " + element[1]);
                 setCardsValues((prevCardsValues) => [...prevCardsValues, element[1]]);
                 if(showCards){
-                    console.log("showCard " + element[1]);
+                    //console.log("showCard " + element[1]);
                     setCards((prevCards) => [...prevCards, "BACK"]);
                 }else{
-                    console.log("privateCard " + element[1]);
+                    //console.log("privateCard " + element[1]);
                     setCards((prevCards) => [...prevCards, element[1]]);
                 }
             }
         });
+        console.log("cartas de " + idPlayer + ": " + cards.toString());
     });
 
-    useEffect(() => {
-        //console.log("Use effect PlayerCards dependency idPlayer");
-        setIdP(idPlayer);
-        console.log("Cambio de la ip " + idP)
-        //console.log("idP: " + idP);
-    }, [idPlayer]);
+    // useEffect(() => {
+    //     //console.log("Use effect PlayerCards dependency idPlayer");
+    //     setIdP(idPlayer);
+    //     console.log("Cambio de la ip " + idP)
+    //     //console.log("idP: " + idP);
+    // }, [idPlayer]);
 
     useEffect(() => {
         
@@ -86,7 +87,7 @@ export default function PlayerCards( { socket, idPlayer, showCards } ){
 
     return(
         <div id='deck'>
-            <h4>Id: {idP}</h4>
+            <h4>Id: {idPlayer}</h4>
             <CardGroup>
                 {
                     cards.map( (card, index) => {
