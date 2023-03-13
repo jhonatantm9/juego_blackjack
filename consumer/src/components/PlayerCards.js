@@ -48,26 +48,29 @@ const cardTemplate = `
 
 export default function PlayerCards({ socket, idPlayer, showCards }) {
     const [cards, setCards] = useState([]);
-    const [cardsValues, setCardsValues] = useState([]);
+    //const [cardsValues, setCardsValues] = useState([]);
+    const [cardsValues, setCardsValues] = useState(new Set());
     const [idP, setIdP] = useState("None");
     //let playerId = "";
     //console.log(idP);
 
     socket.on("receive_card", (data) => {
-        console.log("Receive card " + idP);
+        console.log("Receive card " + idPlayer);
         //console.log("idPlayer: " + idPlayer + "\nidP: " + idP);
         if (idPlayer === data.id) {
-            console.log("Card for " + idPlayer + "  " + data.card);
+            console.log("Card for " + idPlayer + "  " + data.card);            
             // setCardsValues( ( ) => { cardsValues.push(data.card); return cardsValues; } );
-            setCardsValues((prevCardsValues) => [...prevCardsValues, data.card]);
+            //setCardsValues((prevCardsValues) => [...prevCardsValues, data.card]);
+            setCardsValues((prevCardsValues) => new Set([...prevCardsValues, data.card]));
+            console.log("Card added to cardsValues " + cardsValues);
             if (showCards) {
                 console.log("showCard " + data.card);
-                //setCards( ( ) => { cards.push("BACK"); return cards; } );
-                setCards((prevCards) => [...prevCards, "BACK"]);
-            } else {
-                console.log("privateCard " + data.card);
                 //setCards( ( ) => { cards.push(data.card); return cards; } );
                 setCards((prevCards) => [...prevCards, data.card]);
+            } else {
+                console.log("privateCard " + data.card);
+                //setCards( ( ) => { cards.push("BACK"); return cards; } );
+                setCards((prevCards) => [...prevCards, "BACK"]);
             }
         }
     });
@@ -78,17 +81,24 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
         data.cards.forEach(element => {
             if(idPlayer === element[0] && cards.length < 2){
                 console.log("Card for "+ idPlayer + "  " + element[1]);
-                setCardsValues((prevCardsValues) => [...prevCardsValues, element[1]]);
+                //setCardsValues((prevCardsValues) => [...prevCardsValues, element[1]]);
+                setCardsValues((prevCardsValues) => new Set([...prevCardsValues, element[1]]));
                 if(showCards){
                     //console.log("showCard " + element[1]);
-                    setCards((prevCards) => [...prevCards, "BACK"]);
+                    setCards((prevCards) => [...prevCards, element[1]]);
                 }else{
                     //console.log("privateCard " + element[1]);
-                    setCards((prevCards) => [...prevCards, element[1]]);
+                    setCards((prevCards) => [...prevCards, "BACK"]);                    
                 }
             }
         });
         console.log("cartas de " + idPlayer + ": " + cards.toString());
+    });
+
+    socket.on("receive_message", (data) => {
+      console.log("Llegó un mensaje");
+      setCards(() => { cards.push(data.message); return cards; });
+      console.log(cards);
     });
 
     // useEffect(() => {
@@ -98,14 +108,10 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
     //     //console.log("idP: " + idP);
     // }, [idPlayer]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
         //console.log("Se ejecuto use Effect 1: " + idP);
-        socket.on("receive_message", (data) => {
-            console.log("Llegó un mensaje");
-            setCards(() => { cards.push(data.message); return cards; });
-            console.log(cards);
-        });
+        
 
         // socket.on("receive_card", (data) => {
         //     console.log("Receive card " + idP);
@@ -125,10 +131,17 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
         //         }
         //     }
         // });
-    }, [socket]);
+    // }, [socket]);
     //idP
 
-
+    useEffect(() => {
+      if(cardsValues.size != cards.length){
+        //cards.pop()
+        const newArray = cards.slice(0, -1);
+        setCards(newArray);
+      }
+      console.log("cards length: " + cards.length);
+    }, [cardsValues]);
 
     return (
         <div id='deck'>

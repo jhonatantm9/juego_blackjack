@@ -41,7 +41,10 @@ io.on("connection", (socket) => {
     socket.on("request_card", (data) => {
         let card = addCard(data.id);
         let canHit = true;
-        if (reduceAce(data.id) > 21) {
+        let playerSum = reduceAce(data.id);
+        console.log("playerSum: " + playerSum);
+        if (playerSum > 21) {
+            console.log("Se pasó de 21");
             canHit = false;
         }
         io.emit("receive_card", {card: card, id: data.id, canHit: canHit});
@@ -50,12 +53,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("stay", (data) => {
-        let nextPlayer = changeTurn(data.id);
-        if(nextPlayer === "dealer"){
-            let dealerCards = hitDealerCards();
-            io.emit("receive_dealer_cards", {cards: dealerCards});
-            //let playersResults = doPlayersWin();
-        }
+        // let nextPlayer = changeTurn(data.id);
+        changeTurn();
+        // if(nextPlayer === "dealer"){
+        //     //let dealerCards = hitDealerCards();
+        //     hitDealerCards();
+        //     // io.emit("receive_dealer_cards", {cards: dealerCards});
+        //     //let playersResults = doPlayersWin();
+        // }
     });
 });
 
@@ -135,11 +140,16 @@ function startGame() {
         }
     }
     io.emit("receive_initial_cards", {cards: cardsToSend});
+    changeTurn();
+    console.log("change turn, new player: " + playerPlaying);
 
     var dealerCards = [];
     for (let i = 0; i < 2; i++) {
         dealerCards.push(addCard("dealer"));        
     }
+    //reduceAce("dealer");
+    console.log("2 primeras dealer: " + dealerSum);
+    console.log(dealerCards.length);
 
     io.emit("receive_initial_dealer_cards", {cards: dealerCards});
 
@@ -155,6 +165,7 @@ function addCard(userId){
                 playersSum[i] += getValue(card);
                 playersAceCount[i] += checkAce(card);
                 console.log("card added to player " + playersId[i] + ", card value: " + card);
+                console.log("puntaje: " + playersSum[i]);
             }
         }
     }else{
@@ -167,16 +178,23 @@ function addCard(userId){
 function changeTurn(){
     if(playerPlaying === ""){
         playerPlaying = playersId[0];
-        return playersId[0];
-    }
-    let idPlayerPlaying = playersId.indexOf(playerPlaying);
-    if(idPlayerPlaying < 3){
-        playerPlaying = playersId[idPlayerPlaying + 1];
-        return playersId[idPlayerPlaying + 1];
+        //return playersId[0];
     }else{
-        playerPlaying = "dealer";
-        return "dealer";
+        let idPlayerPlaying = playersId.indexOf(playerPlaying);
+        //console.log("idPlayer playing before change: " + idPlayerPlaying);
+        if(idPlayerPlaying < (numberOfPlayers - 1)){
+            playerPlaying = playersId[idPlayerPlaying + 1];
+            //return playersId[idPlayerPlaying + 1];
+        }else{
+            playerPlaying = "dealer";
+            //return "dealer";
+        }
     }
+    io.emit("change_turn", {nextPlayer: playerPlaying});
+    if(playerPlaying === "dealer"){
+        console.log("turno del dealer");
+        hitDealerCards();
+    }    
 }
 
 function hit() {
@@ -192,37 +210,8 @@ function hit() {
 
 }
 
-function stay() {
-    dealerSum = reduceAce(dealerSum, dealerAceCount);
-    yourSum = reduceAce(yourSum, yourAceCount);
-
-    canHit = false;
-    document.getElementById("hidden").src = "./cards/" + hidden + ".png";
-
-    let message = "";
-    if (yourSum > 21) {
-        message = "You Lose!";
-    }
-    else if (dealerSum > 21) {
-        message = "You win!";
-    }
-    //both you and dealer <= 21
-    else if (yourSum == dealerSum) {
-        message = "Tie!";
-    }
-    else if (yourSum > dealerSum) {
-        message = "You Win!";
-    }
-    else if (yourSum < dealerSum) {
-        message = "You Lose!";
-    }
-
-    document.getElementById("dealer-sum").innerText = dealerSum;
-    document.getElementById("your-sum").innerText = yourSum;
-    document.getElementById("results").innerText = message;
-}
-
 function hitDealerCards(){
+    console.log("Suma inicial del dealer: " + dealerSum);
     let maxValue = Math.floor(Math.random() * 3) + 15;
     var dealerCards = []
     while (dealerSum < maxValue) {
@@ -230,7 +219,8 @@ function hitDealerCards(){
         reduceAce("dealer");
         console.log("dealer sum: " + dealerSum);
     }
-    return dealerCards;
+    //return dealerCards;
+    io.emit("receive_dealer_cards", {cards: dealerCards});
 }
 
 function doPlayersWin(){
@@ -284,13 +274,13 @@ function checkAce(card) {
 function reduceAce(playerId) {
     if(playerId != "dealer"){
         let i = playersId.indexOf(playerId);
-        let playerSum = playersSum[i];
-        let playerAceCount = playersAceCount[i];
-        while (playerSum > 21 && playerAceCount > 0) {
+        //let playerSum = playersSum[i];
+        //let playerAceCount = playersAceCount[i];
+        while (playersSum[i] > 21 && playersAceCount[i] > 0) {
             playersSum[i] -= 10;
             playersAceCount[i] -= 1;
         }
-        return playerSum[i];
+        return playersSum[i];
     }else{
         dealerSum -= 10;
         dealerAceCount -= 1;

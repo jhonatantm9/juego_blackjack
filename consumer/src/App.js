@@ -11,6 +11,7 @@ function App() {
     const [message, setMessage] = useState("");
     const [messageReceived, setMessageReceived] = useState("");
     const [playersId, setPlayersId] = useState(["", "", "", ""]);
+    const [buttonsEnabled, setButtonsEnabled] = useState(false);
 
     const sendMessage = () => {
         socket.emit("send_message", { message });
@@ -48,7 +49,7 @@ function App() {
                 newArray[0] = aux;
             }
         }
-        console.log("new array: " + newArray);
+        //console.log("new array: " + newArray);
         //setPlayersId(newArray);
         return (newArray);
         // setPlayersId(() => {
@@ -108,6 +109,10 @@ function App() {
         });
     }
 
+    const hit = () => {
+        socket.emit("request_card", {id: playersId[0]});
+    }
+
     const stay = () => {
         //TODO desactivación de botones
         socket.emit("stay", {id: playersId[0]});
@@ -118,37 +123,58 @@ function App() {
         setMessageReceived(data.message);
     });
 
-    useEffect(() => {
-        console.log("UseEffect App.js");
-        // socket.on("receive_message", (data) => {
-        //     setMessageReceived(data.message);
-        // });
+    socket.on("change_turn", (data) => {
+        // console.log("turno de: " + data.nextPlayer);
+        if(data.nextPlayer === socket.id){
+            setButtonsEnabled(true);
+        }else{
+            setButtonsEnabled(false);
+        }
+    });
 
-        socket.on("receive_ids", (data) => {
-            console.log("data: " + data.playersId);
-            // setPlayersId([...changeArray(data)]);
-            //changeArray(data);
-            changeIdPlayers(data);
-            // setPlayersId([...newArray]);
-            // setPlayersId(() => {
-            //     let i = 0;
-            //     while (i < data.playersId.length) {
-            //         playersId[i] = data.playersId[i];
-            //         i++;
-            //     }
-            //     for (let j = 0; j < 4; j++) {
-            //         let aux = playersId[j];
-            //         if (aux === socket.id) {
-            //             playersId[j] = playersId[0];
-            //             playersId[0] = aux;
-            //         }
-            //     }
-            //     // console.log(playersId);
-            //     return playersId;
-            // });
-            console.log("Array playersId luego de function: " + playersId);
-        });
-    }, [socket])
+    socket.on("receive_card", (data) => {
+        // console.log("can hit: " + data.canHit);
+        if(!data.canHit){
+            setButtonsEnabled(false);
+            stay();
+        }
+    });
+
+    socket.on("receive_ids", (data) => {
+        changeIdPlayers(data);
+    });
+
+    // useEffect(() => {
+    //     console.log("UseEffect App.js");
+    //     // socket.on("receive_message", (data) => {
+    //     //     setMessageReceived(data.message);
+    //     // });
+
+    //     // socket.on("receive_ids", (data) => {
+    //     //     // console.log("data: " + data.playersId);
+    //     //     // setPlayersId([...changeArray(data)]);
+    //     //     //changeArray(data);
+    //     //     changeIdPlayers(data);
+    //     //     // setPlayersId([...newArray]);
+    //     //     // setPlayersId(() => {
+    //     //     //     let i = 0;
+    //     //     //     while (i < data.playersId.length) {
+    //     //     //         playersId[i] = data.playersId[i];
+    //     //     //         i++;
+    //     //     //     }
+    //     //     //     for (let j = 0; j < 4; j++) {
+    //     //     //         let aux = playersId[j];
+    //     //     //         if (aux === socket.id) {
+    //     //     //             playersId[j] = playersId[0];
+    //     //     //             playersId[0] = aux;
+    //     //     //         }
+    //     //     //     }
+    //     //     //     // console.log(playersId);
+    //     //     //     return playersId;
+    //     //     // });
+    //     //     // console.log("Array playersId luego de function: " + playersId);
+    //     // });
+    // }, [socket])
 
 
     return (
@@ -176,7 +202,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} />
+                                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={false} />
                                 </Col>
                             </Row>
                         </Container>
@@ -188,7 +214,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C1
-                                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={true}></PlayerCards>
+                                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={false}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -205,12 +231,12 @@ function App() {
                         <Row>
                            <div className="" style={{paddingTop:"20px"}}>
                            <div className="boton1 d-inline-block">
-                                <button onClick={startGame}>
+                                <button onClick={hit} disabled={!buttonsEnabled}>
                                     Pedir
                                 </button>
                             </div>
                             <div className="boton2 d-inline-block">
-                                <button onClick={startGame}>
+                                <button onClick={stay} disabled={!buttonsEnabled}>
                                     Plantarse
                                 </button>
                             </div>
@@ -222,7 +248,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C3
-                                    <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={true}></PlayerCards>
+                                    <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={false}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -234,7 +260,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F3C1
-                                    <PlayerCards socket={socket} idPlayer={playersId[0]} showCards={false}></PlayerCards>
+                                    <PlayerCards socket={socket} idPlayer={playersId[0]} showCards={true}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
