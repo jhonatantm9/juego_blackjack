@@ -55,14 +55,14 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
     //console.log(idP);
 
     socket.on("receive_card", (data) => {
-        console.log("Receive card " + idPlayer);
+        //console.log("Receive card " + idPlayer);
         //console.log("idPlayer: " + idPlayer + "\nidP: " + idP);
         if (idPlayer === data.id) {
             console.log("Card for " + idPlayer + "  " + data.card);            
             // setCardsValues( ( ) => { cardsValues.push(data.card); return cardsValues; } );
             //setCardsValues((prevCardsValues) => [...prevCardsValues, data.card]);
             setCardsValues((prevCardsValues) => new Set([...prevCardsValues, data.card]));
-            console.log("Card added to cardsValues " + cardsValues);
+            //console.log("Card added to cardsValues " + cardsValues);
             if (showCards) {
                 console.log("showCard " + data.card);
                 //setCards( ( ) => { cards.push(data.card); return cards; } );
@@ -148,7 +148,17 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
             <h4>Id: {idPlayer}</h4>
             <CardGroup>
                 {
-                    cards.map((card, index) => {
+                    // cards.map((card, index) => {
+                    //     let imageString = "images/" + card + ".png";
+                    //     let keyValue = card + "-" + index;
+                    //     return (
+                    //         <Card key={keyValue}>
+                    //             <Card.Img variant="top" src={imageString} style={{ width: '100px' }} />
+                    //         </Card>
+                    //     );
+                    // })
+                    [...cardsValues].map((card, index) => {
+                      if(showCards){
                         let imageString = "images/" + card + ".png";
                         let keyValue = card + "-" + index;
                         return (
@@ -156,6 +166,15 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
                                 <Card.Img variant="top" src={imageString} style={{ width: '100px' }} />
                             </Card>
                         );
+                      }else{
+                        let imageString = "images/BACK.png";
+                        let keyValue = card + "-" + index;
+                        return (
+                            <Card key={keyValue}>
+                                <Card.Img variant="top" src={imageString} style={{ width: '100px' }} />
+                            </Card>
+                        );
+                      }
                     })
                 }
             </CardGroup>

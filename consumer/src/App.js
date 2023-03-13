@@ -12,6 +12,8 @@ function App() {
     const [messageReceived, setMessageReceived] = useState("");
     const [playersId, setPlayersId] = useState(["", "", "", ""]);
     const [buttonsEnabled, setButtonsEnabled] = useState(false);
+    const [userPlaying, setUserPlaying] = useState(false);
+    const [gameFinished, setGameFinished] = useState(false);
 
     const sendMessage = () => {
         socket.emit("send_message", { message });
@@ -19,6 +21,7 @@ function App() {
 
     const startGame = () => {
         socket.emit("start_game", { hostPlayer: socket.id });
+        setGameFinished(false);
     };
 
     // const handleUpdateItems = (updates) => {
@@ -115,7 +118,10 @@ function App() {
 
     const stay = () => {
         //TODO desactivación de botones
-        socket.emit("stay", {id: playersId[0]});
+        if(userPlaying){
+            console.log("player decided to stay");
+            socket.emit("stay", {id: playersId[0]});
+        }
     }
 
 
@@ -124,24 +130,42 @@ function App() {
     });
 
     socket.on("change_turn", (data) => {
-        // console.log("turno de: " + data.nextPlayer);
+        console.log("turno de: " + data.nextPlayer);
         if(data.nextPlayer === socket.id){
+            setUserPlaying(true);
             setButtonsEnabled(true);
         }else{
+            setUserPlaying(false);
             setButtonsEnabled(false);
         }
     });
 
-    socket.on("receive_card", (data) => {
-        // console.log("can hit: " + data.canHit);
+    socket.on("can_play", (data) => {
+        console.log("can hit: " + data.canHit);
         if(!data.canHit){
             setButtonsEnabled(false);
+            console.log("cannot play anymore");
             stay();
         }
     });
 
     socket.on("receive_ids", (data) => {
         changeIdPlayers(data);
+    });
+
+    socket.on("finish_game", (data) =>{
+        setGameFinished(true);
+        data.playersId.forEach((element, index) => {
+            if(element === socket.id){
+                if(data.playersResults[index] == 1){
+                    setMessageReceived("Ganaste");
+                }else if(data.playersResults[index] == -1){
+                    setMessageReceived("Perdiste");
+                }else{
+                    setMessageReceived("Empataste");
+                }
+            }
+        });
     });
 
     // useEffect(() => {
@@ -202,7 +226,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F1C1
-                                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={false} />
+                                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={gameFinished} />
                                 </Col>
                             </Row>
                         </Container>
@@ -214,7 +238,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C1
-                                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={false}></PlayerCards>
+                                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={gameFinished}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
@@ -248,7 +272,7 @@ function App() {
                             <Row>
                                 <Col>
                                     F2C3
-                                    <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={false}></PlayerCards>
+                                    <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={gameFinished}></PlayerCards>
                                 </Col>
                             </Row>
                         </Container>
