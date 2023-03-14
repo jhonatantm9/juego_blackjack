@@ -275,7 +275,7 @@ const GameView = () => {
                     alignItems: "center",
                 }}>
                     Player 3
-                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={true} />
+                    <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={gameFinished} />
                 </Col>
             </Row>
             <Row>
@@ -286,7 +286,7 @@ const GameView = () => {
                     alignItems: "center",
                 }}>
                     Player 2
-                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={true} />
+                    <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={gameFinished} />
                 </Col>
                 <Col xs={4} style={{
                     display: "flex",
@@ -295,7 +295,7 @@ const GameView = () => {
                     alignItems: "center",
                 }}>
                     Mesa
-                    <DealerCards socket={socket} />
+                    <DealerCards socket={socket} showCards={gameFinished} />
                 </Col>
                 <Col xs={4} style={{
                     display: "flex",
@@ -304,7 +304,7 @@ const GameView = () => {
                     alignItems: "center",
                 }}>
                     Player 1
-                    <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={true} />
+                    <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={gameFinished} />
                 </Col>
             </Row>
             <Row style={{
@@ -319,7 +319,7 @@ const GameView = () => {
                     alignItems: "center",
                 }}>
                     Player 0
-                    <PlayerCards socket={socket} idPlayer={playersId[0]} showCards={false} />
+                    <PlayerCards socket={socket} idPlayer={playersId[0]} showCards={true} />
                     <Container style={{
                         maxWidth: "180px",
                         display: "flex",
@@ -327,10 +327,10 @@ const GameView = () => {
                         alignItems: "center",
                         gap: "10px",
                     }}>
-                        <Button variant="primary" onClick={hit}>
+                        <Button variant="primary" onClick={hit} disabled={!buttonsEnabled}>
                             Pedir
                         </Button>
-                        <Button variant="primary" onClick={stay}>
+                        <Button variant="primary" onClick={stay} disabled={!buttonsEnabled}>
                             Plantarse
                         </Button>
 
