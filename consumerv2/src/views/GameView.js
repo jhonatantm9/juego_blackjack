@@ -1,5 +1,5 @@
 import { Container, Row, Col, InputGroup, FormControl, Button } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import io from 'socket.io-client';
 import PlayerCards from "../components/PlayerCards.js";
 import DealerCards from "../components/DealerCards.js";
@@ -26,76 +26,7 @@ const GameView = () => {
         setGameFinished(false);
     };
 
-    // const handleUpdateItems = (updates) => {
-    //     setPlayersId(playersId.map((item, index) => {
-    //         const update = updates.find(u => u.index === index);
-    //         if (update) {
-    //             // If this item has an update, return a new object with the updated value
-    //             return { ...item, value: update.value };
-    //         } else {
-    //             // Otherwise, return the original item
-    //             return item;
-    //         }
-    //     }));
-    // };
-
-    const changeArray = (data) => {
-        const newArray = [...playersId];
-        let i = 0;
-        while (i < data.playersId.length) {
-            //setPlayersId([...playersId]);
-            newArray[i] = data.playersId[i];
-            i++;
-        }
-        for (let j = 0; j < 4; j++) {
-            let aux = newArray[j];
-            if (aux === socket.id) {
-                newArray[j] = newArray[0];
-                newArray[0] = aux;
-            }
-        }
-        //console.log("new array: " + newArray);
-        //setPlayersId(newArray);
-        return (newArray);
-        // setPlayersId(() => {
-        //     //playersId = new Array(4).fill("");
-        //     let i = 0;
-        //     while (i < data.playersId.length) {
-        //         //setPlayersId([...playersId]);
-        //         newArray[i] = data.playersId[i];
-        //         i++;
-        //     }
-        //     for (let j = 0; j < 4; j++) {
-        //         let aux = newArray[j];
-        //         if (aux === socket.id) {
-        //             newArray[j] = newArray[0];
-        //             newArray[0] = aux;
-        //         }
-        //     }
-        //     // console.log(playersId);
-        //     return newArray;
-        // });
-
-    }
-
     const changeIdPlayers = (data) => {
-        // setPlayersId(() => {
-        //     let i = 0;
-        //     while (i < data.playersId.length) {
-        //         //setPlayersId([...playersId]);
-        //         playersId[i] = data.playersId[i];
-        //         i++;
-        //     }
-        //     for (let j = 0; j < 4; j++) {
-        //         let aux = playersId[j];
-        //         if (aux === socket.id) {
-        //             playersId[j] = playersId[0];
-        //             playersId[0] = aux;
-        //         }
-        //     }
-        //     // console.log(playersId);
-        //     return playersId;
-        // });
         setPlayersId((prevState) => {
             let newPlayersId = [...prevState];
             let i = 0;
@@ -170,37 +101,7 @@ const GameView = () => {
         });
     });
 
-    // useEffect(() => {
-    //     console.log("UseEffect App.js");
-    //     // socket.on("receive_message", (data) => {
-    //     //     setMessageReceived(data.message);
-    //     // });
-
-    //     // socket.on("receive_ids", (data) => {
-    //     //     // console.log("data: " + data.playersId);
-    //     //     // setPlayersId([...changeArray(data)]);
-    //     //     //changeArray(data);
-    //     //     changeIdPlayers(data);
-    //     //     // setPlayersId([...newArray]);
-    //     //     // setPlayersId(() => {
-    //     //     //     let i = 0;
-    //     //     //     while (i < data.playersId.length) {
-    //     //     //         playersId[i] = data.playersId[i];
-    //     //     //         i++;
-    //     //     //     }
-    //     //     //     for (let j = 0; j < 4; j++) {
-    //     //     //         let aux = playersId[j];
-    //     //     //         if (aux === socket.id) {
-    //     //     //             playersId[j] = playersId[0];
-    //     //     //             playersId[0] = aux;
-    //     //     //         }
-    //     //     //     }
-    //     //     //     // console.log(playersId);
-    //     //     //     return playersId;
-    //     //     // });
-    //     //     // console.log("Array playersId luego de function: " + playersId);
-    //     // });
-    // }, [socket])
+    
     return (
         <Container fluid style={{
             backgroundColor: "#c8c2c2",
