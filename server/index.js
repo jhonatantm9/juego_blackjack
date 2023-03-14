@@ -3,7 +3,6 @@ const app = express(); //Servidor express
 const http = require("http");
 const {Server} = require("socket.io");
 const cors = require("cors"); //Cors permite conexiones más fáciles y evitar posibles errores
-const { setTimeout } = require('timers/promises');
 
 app.use(cors());
 const server = http.createServer(app);
