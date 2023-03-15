@@ -11,6 +11,10 @@ export default function DealerCards({ socket, showCards }) {
     //     console.log(cards);
     // });
 
+    socket.on("receive_ids", (data) =>{
+        setCardsValues(new Set());
+    });
+
     socket.on("receive_initial_dealer_cards", (data) => {
         console.log("# dealer initial cards: " + data.cards + Math.random());
         data.cards.forEach((card, index) => {

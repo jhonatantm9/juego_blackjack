@@ -5,12 +5,15 @@ export default function PlayerCards({ socket, idPlayer, showCards }) {
     const [cardsValues, setCardsValues] = useState(new Set());
 
     socket.on("receive_card", (data) => {
-        //console.log("Receive card " + idPlayer);
-        //console.log("idPlayer: " + idPlayer + "\nidP: " + idP);
+        console.log("Receive card " + idPlayer);
         if (idPlayer === data.id) {
             console.log("Card for " + idPlayer + "  " + data.card);
             setCardsValues((prevCardsValues) => new Set([...prevCardsValues, data.card]));
         }
+    });
+
+    socket.on("receive_ids", (data) =>{
+        setCardsValues(new Set());
     });
 
     socket.on("receive_initial_cards", (data) => {

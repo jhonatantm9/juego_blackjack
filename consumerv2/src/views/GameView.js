@@ -1,5 +1,6 @@
 import { Container, Row, Col, InputGroup, FormControl, Button } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import io from 'socket.io-client';
 import PlayerCards from "../components/PlayerCards.js";
 import DealerCards from "../components/DealerCards.js";
@@ -10,20 +11,21 @@ const socket = io.connect("http://localhost:3001");//URL backend
 const regex = new RegExp("^[0-9]+-[A-Z]$");
 
 const GameView = () => {
-    const [message, setMessage] = useState("");
-    const [messageReceived, setMessageReceived] = useState("");
+    const [playerResult, setPlayerResult] = useState("");
     const [playersId, setPlayersId] = useState(["", "", "", ""]);
     const [buttonsEnabled, setButtonsEnabled] = useState(false);
     const [userPlaying, setUserPlaying] = useState(false);
     const [gameFinished, setGameFinished] = useState(false);
-
-    const sendMessage = () => {
-        socket.emit("send_message", { message });
-    };
+    const [nickNames, setNickNames] = useState(["", "", "", ""]);
+    const [userNickName, setUserNickName] = useState("");
+    const [gameStarted, setGameStarted] = useState(false);
+    const navigate = useNavigate();
 
     const startGame = () => {
         socket.emit("start_game", { hostPlayer: socket.id });
-        setGameFinished(false);
+        // setGameStarted(true);
+        // setGameFinished(false);
+        // setPlayerResult("");
     };
 
     const changeIdPlayers = (data) => {
@@ -45,22 +47,52 @@ const GameView = () => {
         });
     }
 
+    const changeNickNames = (data) => {
+        console.log(data.nickNames);
+        setNickNames((prevState) => {
+            let newNickNames = [...prevState];
+            let i = 0;
+            while (i < data.nickNames.length) {
+                newNickNames[i] = data.nickNames[i];
+                i++;
+            }
+            for (let j = 0; j < 4; j++) {
+                let aux = newNickNames[j];
+                if (aux === userNickName) {
+                    newNickNames[j] = newNickNames[0];
+                    newNickNames[0] = aux;
+                }
+            }
+            return newNickNames;
+        });
+    }
+
     const hit = () => {
         socket.emit("request_card", {id: playersId[0]});
     }
 
     const stay = () => {
-        //TODO desactivación de botones
         if(userPlaying){
             console.log("player decided to stay");
             socket.emit("stay", {id: playersId[0]});
+        }else{
+            console.log("NO ESTOY JUGANDO AHORA");
         }
     }
 
+    const leaveRoom = () => {
+        navigate('/home');
+        window.location.reload();
+    }
 
-    socket.on("receive_message", (data) => {
-        setMessageReceived(data.message);
-    });
+    socket.on("receive_result_join", (data) =>{
+        if(!data.result){
+            console.log("no puedes jugar en esta sala");
+            leaveRoom();
+        }else{
+            console.log("bienvenid@");
+        }
+    })
 
     socket.on("change_turn", (data) => {
         console.log("turno de: " + data.nextPlayer);
@@ -75,7 +107,7 @@ const GameView = () => {
 
     socket.on("can_play", (data) => {
         console.log("can hit: " + data.canHit);
-        if(!data.canHit){
+        if(data.idPlayer === socket.id && !data.canHit){
             setButtonsEnabled(false);
             console.log("cannot play anymore");
             stay();
@@ -83,23 +115,45 @@ const GameView = () => {
     });
 
     socket.on("receive_ids", (data) => {
+        setGameStarted(true);
+        setGameFinished(false);
+        setPlayerResult("");
+        console.log("obtiene ids: " + data);
         changeIdPlayers(data);
+    });
+
+    socket.on("receive_nicknames", (data) => {
+        console.log("obtiene nicks: " + data);
+        changeNickNames(data);
     });
 
     socket.on("finish_game", (data) =>{
         setGameFinished(true);
+        setGameStarted(false);
         data.playersId.forEach((element, index) => {
             if(element === socket.id){
                 if(data.playersResults[index] == 1){
-                    setMessageReceived("Ganaste");
+                    setPlayerResult("Ganaste");
                 }else if(data.playersResults[index] == -1){
-                    setMessageReceived("Perdiste");
+                    setPlayerResult("Perdiste");
                 }else{
-                    setMessageReceived("Empataste");
+                    setPlayerResult("Empataste");
                 }
             }
         });
     });
+
+    useEffect(() => {
+        socket.emit("join_game", {roomId: localStorage.getItem("roomId"), playerId: socket.id});
+        setNickNames(() => {
+            let newArray = [...nickNames]
+            newArray[0] = (localStorage.getItem("nickName"));
+            return newArray;
+        });
+        setUserNickName(localStorage.getItem("nickName"));
+        socket.emit("add_nickname", {nick: localStorage.getItem("nickName")});
+        console.log("finished useEffect");
+    }, []);
 
     
     return (
@@ -115,7 +169,7 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    <h1>Game View</h1>
+                    <h1>BlackJack</h1>
                 </Col>
             </Row>
             <Row style={{
@@ -126,21 +180,11 @@ const GameView = () => {
                 <Col style={{
                     maxWidth: "500px",
                     display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                     gap: "10px",
                 }}>
-                    <InputGroup>
-                        <FormControl placeholder="Message" aria-label="Message" aria-describedby="basic-addon1"
-                            value={message} onChange={(e) => { setMessage((e.target.value.trim()).toUpperCase()); }}
-                            onKeyUp={(e) => {
-                                if (e.key === "Enter") {
-                                    sendMessage();
-                                }
-                            }} />
-                    </InputGroup>
-                    <Button variant="primary" onClick={sendMessage}>
-                        SendMessage
-                    </Button>
-                    <Button variant="primary" onClick={startGame}>
+                    <Button variant="primary" onClick={startGame} disabled={gameStarted}>
                         StartGame
                     </Button>
                 </Col>
@@ -151,7 +195,7 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    Message: {messageReceived}
+                    <h4>{playerResult}</h4>
                 </Col>
             </Row>
             <Row>
@@ -160,7 +204,6 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    PlayersID: {playersId.toString()}
                 </Col>
             </Row>
             <Row style={{
@@ -175,7 +218,7 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    Player 3
+                    {nickNames[3]}
                     <PlayerCards socket={socket} idPlayer={playersId[3]} showCards={gameFinished} />
                 </Col>
             </Row>
@@ -186,7 +229,7 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    Player 2
+                    {nickNames[2]}
                     <PlayerCards socket={socket} idPlayer={playersId[2]} showCards={gameFinished} />
                 </Col>
                 <Col xs={4} style={{
@@ -204,7 +247,7 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    Player 1
+                    {nickNames[1]}
                     <PlayerCards socket={socket} idPlayer={playersId[1]} showCards={gameFinished} />
                 </Col>
             </Row>
@@ -219,7 +262,7 @@ const GameView = () => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    Player 0
+                    {nickNames[0]}
                     <PlayerCards socket={socket} idPlayer={playersId[0]} showCards={true} />
                     <Container style={{
                         maxWidth: "180px",
@@ -227,6 +270,7 @@ const GameView = () => {
                         justifyContent: "space-between",
                         alignItems: "center",
                         gap: "10px",
+                        marginTop: "20px",
                     }}>
                         <Button variant="primary" onClick={hit} disabled={!buttonsEnabled}>
                             Pedir
