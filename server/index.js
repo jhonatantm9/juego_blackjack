@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "https://frabjous-jalebi-83db7e.netlify.app",//URL frontend 3000
+        origin: "http://localhost:3000",//URL frontend 3000
         methods: ["GET", "POST"]
     }
 });
